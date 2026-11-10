@@ -1,32 +1,32 @@
 # AI-Voice-Career-Assistant
 
-A Streamlit voice career assistant that transcribes uploaded audio with Gnani
-Speech-to-Text and generates career guidance with Google Gemini. Text-to-Speech
-is not connected yet.
+A voice career assistant with a static web interface and Python serverless
+functions. It transcribes uploaded audio with Gnani Speech-to-Text, then
+generates career guidance with Google Gemini. Text-to-Speech is not connected.
 
-## Setup on Windows
+## Deploy to Vercel
 
-```powershell
-cd "C:\path\to\ai-voice-career-assistant"
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-python -m pip install -r requirements.txt
-streamlit run app.py
-```
+1. Import `DevallaGiribabu/AI-Voice-Career-Assistant` into your Vercel account.
+2. Set `GNANI_API_KEY` and `GEMINI_API_KEY` in the Vercel project's
+   **Settings > Environment Variables**. Use Production (and Preview if
+   desired), then redeploy.
+3. Keep these values in Vercel only; never commit them or put them in the
+   browser code.
 
-Copy `.env.example` to `.env` and add your Gnani and Gemini API keys:
+Vercel serves `index.html` and deploys the Python functions in `api/`.
+`vercel.json` sets a 60-second function duration. Audio uploads are limited
+to 4 MiB to fit within the serverless request-body limit.
 
-```text
-GNANI_API_KEY=your_gnani_api_key_here
-GEMINI_API_KEY=your_gemini_api_key_here
-```
+## Run locally
 
-`.env` is ignored by Git. Never put API keys in application code or commit them.
+Install the Vercel CLI and Python dependencies, then run `vercel dev` from the
+project directory. Set `GNANI_API_KEY` and `GEMINI_API_KEY` in your local
+environment, or copy `.env.example` to `.env` and fill in the values. `.env`
+files are ignored by Git.
 
 ## Services
 
-- `services/stt.py` transcribes uploaded audio with the Gnani STT API.
-- `services/career_ai.py` generates career guidance using the Gemini
-  `gemini-3.5-flash-lite` model.
-- The current flow is audio upload -> transcription -> career guidance. TTS is
-  a future addition.
+- `api/transcribe.py` accepts an audio upload and calls the Gnani STT service.
+- `api/guidance.py` accepts the transcript and calls Gemini
+  `gemini-3.5-flash-lite`.
+- `services/` contains the Gnani and Gemini service clients.

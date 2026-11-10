@@ -25,7 +25,7 @@ def generate_career_guidance(user_question: str) -> str:
 
     if not api_key:
         raise CareerAIError(
-            "GEMINI_API_KEY is missing from the project's .env file."
+            "GEMINI_API_KEY is not configured in the environment."
         )
 
     # Check if the question is empty

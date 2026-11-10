@@ -22,7 +22,7 @@ def transcribe_audio(
     """Send uploaded audio to Gnani STT and return its transcript."""
     api_key = os.getenv("GNANI_API_KEY")
     if not api_key:
-        raise GnaniSTTError("GNANI_API_KEY is missing from the project's .env file.")
+        raise GnaniSTTError("GNANI_API_KEY is not configured in the environment.")
     if not audio_data:
         raise GnaniSTTError("The uploaded audio file is empty.")
 
