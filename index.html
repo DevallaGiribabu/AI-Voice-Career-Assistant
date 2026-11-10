@@ -102,6 +102,7 @@
           <p class="hint">Maximum file size: 4 MiB.</p>
           <button id="submit" type="submit" disabled>Transcribe and get guidance</button>
         </form>
+        <button id="retry-guidance" type="button" hidden>Retry career guidance</button>
         <p id="status" role="status" aria-live="polite"></p>
       </section>
 
@@ -120,7 +121,9 @@
       const form = document.querySelector("#audio-form");
       const audioInput = document.querySelector("#audio");
       const submitButton = document.querySelector("#submit");
+      const retryButton = document.querySelector("#retry-guidance");
       const status = document.querySelector("#status");
+      let activeTranscript = "";
 
       audioInput.addEventListener("change", () => {
         submitButton.disabled = !audioInput.files.length;
@@ -135,6 +138,33 @@
         return result;
       }
 
+      async function requestGuidance(transcript) {
+        retryButton.disabled = true;
+        status.dataset.error = "false";
+        status.textContent = "Preparing your career guidance…";
+        try {
+          const result = await post("/api/guidance", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ transcript }),
+          });
+          document.querySelector("#guidance").textContent = result.guidance;
+          document.querySelector("#guidance-section").hidden = false;
+          retryButton.hidden = true;
+          status.textContent = "Your guidance is ready.";
+        } catch (error) {
+          status.dataset.error = "true";
+          status.textContent = error.message || "Something went wrong. Please try again.";
+          retryButton.hidden = false;
+        } finally {
+          retryButton.disabled = false;
+        }
+      }
+
+      retryButton.addEventListener("click", () => {
+        if (activeTranscript) requestGuidance(activeTranscript);
+      });
+
       form.addEventListener("submit", async (event) => {
         event.preventDefault();
         const audio = audioInput.files[0];
@@ -147,6 +177,8 @@
 
         submitButton.disabled = true;
         status.dataset.error = "false";
+        activeTranscript = "";
+        retryButton.hidden = true;
         document.querySelector("#transcript-section").hidden = true;
         document.querySelector("#guidance-section").hidden = true;
 
@@ -160,16 +192,8 @@
           });
           document.querySelector("#transcript").textContent = transcription.transcript;
           document.querySelector("#transcript-section").hidden = false;
-
-          status.textContent = "Preparing your career guidance…";
-          const result = await post("/api/guidance", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ transcript: transcription.transcript }),
-          });
-          document.querySelector("#guidance").textContent = result.guidance;
-          document.querySelector("#guidance-section").hidden = false;
-          status.textContent = "Your guidance is ready.";
+          activeTranscript = transcription.transcript;
+          await requestGuidance(activeTranscript);
         } catch (error) {
           status.dataset.error = "true";
           status.textContent = error.message || "Something went wrong. Please try again.";

@@ -32,5 +32,6 @@ Git.
 
 - `api/transcribe.py` accepts an audio upload and calls the Gnani STT service.
 - `api/guidance.py` accepts the transcript and calls Gemini
-  `gemini-3.5-flash-lite`.
+  `gemini-3.5-flash-lite`, with bounded retries and a `gemini-2.5-flash`
+  fallback when Gemini reports a temporary overload.
 - `services/` contains the Gnani and Gemini service clients.
