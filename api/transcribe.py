@@ -8,7 +8,7 @@ MAX_AUDIO_BYTES = 4 * 1024 * 1024
 app = FastAPI()
 
 
-@app.post("/")
+@app.post("/api/transcribe")
 async def transcribe(audio: UploadFile = File(...)) -> dict[str, str]:
     audio_data = await audio.read(MAX_AUDIO_BYTES + 1)
     if len(audio_data) > MAX_AUDIO_BYTES:

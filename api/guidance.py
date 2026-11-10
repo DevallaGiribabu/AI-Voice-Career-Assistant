@@ -11,7 +11,7 @@ class GuidanceRequest(BaseModel):
 app = FastAPI()
 
 
-@app.post("/")
+@app.post("/api/guidance")
 def guidance(request: GuidanceRequest) -> dict[str, str]:
     try:
         answer = generate_career_guidance(request.transcript)

@@ -1,5 +1,6 @@
 fastapi
 python-multipart
+streamlit
 python-dotenv
 requests
 google-genai
